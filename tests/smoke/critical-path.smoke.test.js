@@ -86,11 +86,64 @@ describe("Smoke test (verificacion critica post-despliegue)", () => {
     expect(status).toBe(200);
   });
 
-  test.todo(
-    "el endpoint GET /accounts/:id responde en menos de 300 ms para una cuenta existente"
-  );
+  //Ejercicio Propuesto 1: GET /accounts/:id responde en menos de 300 ms
+  test("el endpoint GET /accounts/:id responde en menos de 300 ms para una cuenta existente", async () => {
+    const cuenta = await api("/accounts", {
+      method: "POST",
+      body: JSON.stringify({ owner: "SmokeTimeTest" }),
+    });
+    const id = cuenta.body.id;
 
-  test.todo(
-    "las cinco rutas principales (health, accounts, deposit, withdraw, transfers) responden todas dentro de un mismo recorrido secuencial sin error 500"
-  );
+    const inicio = performance.now();
+    const { status } = await api(`/accounts/${id}`);
+    const fin = performance.now();
+    
+    const tiempoRespuesta = fin - inicio;
+
+    expect(status).toBe(200);
+    expect(tiempoRespuesta).toBeLessThan(300); 
+  });
+
+  //Ejercicio Propuesto 2: Las cinco rutas principales responden sin error 500 en un recorrido secuencial
+  test("las cinco rutas principales (health, accounts, deposit, withdraw, transfers) responden todas dentro de un mismo recorrido secuencial sin error 500", async () => {
+    
+    // Ruta 1: health
+    const rHealth = await api("/health");
+    expect(rHealth.status).not.toBe(500);
+    // Ruta 2: accounts
+    const rOrigen = await api("/accounts", {
+      method: "POST",
+      body: JSON.stringify({ owner: "SecuencialOrigen" }),
+    });
+    expect(rOrigen.status).not.toBe(500);
+    const rDestino = await api("/accounts", {
+      method: "POST",
+      body: JSON.stringify({ owner: "SecuencialDestino" }),
+    });
+    expect(rDestino.status).not.toBe(500);
+    const idOrigen = rOrigen.body.id;
+    const idDestino = rDestino.body.id;
+    // Ruta 3: deposit (Depositar al origen)
+    const rDeposit = await api(`/accounts/${idOrigen}/deposit`, {
+      method: "POST",
+      body: JSON.stringify({ amountCents: 3000 }),
+    });
+    expect(rDeposit.status).not.toBe(500);
+    // Ruta 4: withdraw (Hacer un retiro parcial del origen)
+    const rWithdraw = await api(`/accounts/${idOrigen}/withdraw`, {
+      method: "POST",
+      body: JSON.stringify({ amountCents: 1000 }),
+    });
+    expect(rWithdraw.status).not.toBe(500);
+    // Ruta 5: transfers (Transferir el saldo restante al destino)
+    const rTransfers = await api("/transfers", {
+      method: "POST",
+      body: JSON.stringify({
+        fromId: idOrigen,
+        toId: idDestino,
+        amountCents: 2000,
+      }),
+    });
+    expect(rTransfers.status).not.toBe(500);
+  });
 });
