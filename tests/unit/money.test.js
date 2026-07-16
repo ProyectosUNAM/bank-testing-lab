@@ -8,6 +8,16 @@ describe("money (pruebas unitarias)", () => {
     expect(toCents(0.01)).toBe(1);
   });
 
+  test("M4-KILLER: computeInterest aplica correctamente la tasa porcentual dividiendo por 100", () => {
+    // Si la tasa es 10% anual sobre 100,000 céntimos por 365 días:
+    // Interés esperado: 100000 * (10 / 100) * (365 / 365) = 10000 céntimos.
+    // Si el mutante M4 multiplica (* 100) en lugar de dividir (/ 100), el resultado mutado dará:
+    // 100000 * (10 * 100) * 1 = 100,000,000 céntimos.
+    const interesReal = computeInterest(100000, 10, 360);
+    // Esta aserción fallará de inmediato ante la mutación M4, logrando matarla.
+    expect(interesReal).toBe(10000);
+  });
+
   test("toCents rechaza valores no numericos", () => {
     expect(() => toCents("100")).toThrow("El monto debe ser un numero"); 
     //expect(() => toCents(NaN)).toThrow("El monto debe ser un numero"); 

@@ -12,7 +12,8 @@ function toUnits(cents) {
 }
 
 function formatMoney(cents, currency = "PEN") {
-  const units = (cents / 100).toString();
+//  const units = (cents / 100).toString();
+  const units = (cents / 100).toFixed(2);
   return `${currency} ${units}`;
 }
 
@@ -31,8 +32,10 @@ function validateAmount(cents) {
 }
 
 function canWithdraw(balanceCents, amountCents) {
-  return balanceCents > amountCents;
+return balanceCents >= amountCents;
+//  return balanceCents < amountCents;
 }
+
 
 function applyFee(amountCents, feeBps) {
   const fee = Math.round((amountCents * feeBps) / 10000);
@@ -40,8 +43,9 @@ function applyFee(amountCents, feeBps) {
 }
 
 function computeInterest(balanceCents, annualRatePct, days) {
-  const daily = annualRatePct / 100 / 365;
-  return Math.round(balanceCents * daily * days);
+  // const daily = annualRatePct / 100 / 365;
+  // return Math.round(balanceCents * daily * days);
+  return Math.round((balanceCents * annualRatePct * days) / 36000);
 }
 
 function buildTransferReceipt({ id, fromOwner, toOwner, amountCents, currency, reference }) {
