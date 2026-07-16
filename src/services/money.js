@@ -42,10 +42,9 @@ function applyFee(amountCents, feeBps) {
   return amountCents + fee;
 }
 
-function computeInterest(balanceCents, annualRatePct, days) {
-  // const daily = annualRatePct / 100 / 365;
-  // return Math.round(balanceCents * daily * days);
-  return Math.round((balanceCents * annualRatePct * days) / 36000);
+function computeInterest(principal, rate, days) {
+  // Fórmula: (Principal * Tasa * Días) / (365 * 100)
+  return Math.round((principal * rate * days) / (365 * 100));
 }
 
 function buildTransferReceipt({ id, fromOwner, toOwner, amountCents, currency, reference }) {

@@ -5,14 +5,16 @@
   "reporters": ["html", "clear-text", "progress"],
   "coverageAnalysis": "perTest",
   "mutate": [
-    "src/services/money.js"
+    "src/services/money.js",
+    "src/services/accounts.service.js"
   ],
   "jest": {
     "projectType": "custom",
     "config": {
       "testEnvironment": "node",
       "testMatch": [
-        "**/tests/unit/**/*.test.js"
+        "**/tests/unit/**/*.test.js",
+        "**/tests/integration/**/*.test.js"
       ]
     }
   },

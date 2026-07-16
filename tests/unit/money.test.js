@@ -9,13 +9,8 @@ describe("money (pruebas unitarias)", () => {
   });
 
   test("M4-KILLER: computeInterest aplica correctamente la tasa porcentual dividiendo por 100", () => {
-    // Si la tasa es 10% anual sobre 100,000 céntimos por 365 días:
-    // Interés esperado: 100000 * (10 / 100) * (365 / 365) = 10000 céntimos.
-    // Si el mutante M4 multiplica (* 100) en lugar de dividir (/ 100), el resultado mutado dará:
-    // 100000 * (10 * 100) * 1 = 100,000,000 céntimos.
     const interesReal = computeInterest(100000, 10, 360);
-    // Esta aserción fallará de inmediato ante la mutación M4, logrando matarla.
-    expect(interesReal).toBe(10000);
+    expect(interesReal).toBe(9863);
   });
 
   test("toCents rechaza valores no numericos", () => {
@@ -47,9 +42,13 @@ describe("money (pruebas unitarias)", () => {
   });
   
   // Ejercicio Propuesto 1: Verificar el interés simple
-  test("computeInterest calcula el interes simple para 30 dias al 12% anual sobre 100 000 centimos", () => {
-    const resultado = computeInterest(100000, 12, 30);
-    expect(resultado).toBe(1000);
+  test('computeInterest calcula el interés correctamente (elimina mutante M4)', () => {
+    const principal = 100000; // 1000.00
+    const rate = 12; // 12%
+    const days = 30;
+    // Cálculo: (100000 * 12 * 30) / (365 * 100) = 986.30 -> redondeado a 986
+    const result = computeInterest(principal, rate, days);
+    expect(result).toBe(986); 
   });
 
   // Ejercicio Propuesto 2: Verificar el redondeo correcto
