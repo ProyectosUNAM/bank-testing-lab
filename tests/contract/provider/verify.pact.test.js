@@ -48,8 +48,7 @@ describe("Verificacion del proveedor ApiCuentasBancarias contra el contrato Pact
         "no existen precondiciones": () => Promise.resolve(),
         "la cuenta 1 existe con saldo 1500": () => Promise.resolve(),
         "la cuenta 999 no existe": () => Promise.resolve(),
-        "la cuenta 1 tiene saldo suficiente y la cuenta 2 existe": () =>
-          Promise.resolve(),
+        //"la cuenta 1 tiene saldo suficiente y la cuenta 2 existe": () => Promise.resolve(),
         "la cuenta 1 tiene saldo insuficiente": () => Promise.resolve(),
         "la cuenta 1 existe": () => Promise.resolve(),
       },

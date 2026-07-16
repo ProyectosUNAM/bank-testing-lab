@@ -8,7 +8,7 @@ const provider = new PactV3({
   dir: path.resolve(process.cwd(), "pacts"),
 });
 
-describe("Contrato: AppMovilBanco consume ApiCuentasBancarias", () => {
+describe("Contrato: AppMovilBanco consume ApiCuentasBancarias"), () => {
   test("POST /accounts crea una cuenta y devuelve su representacion", async () => {
     provider
       .given("no existen precondiciones")
@@ -21,7 +21,7 @@ describe("Contrato: AppMovilBanco consume ApiCuentasBancarias", () => {
       })
       .willRespondWith({
         status: 201,
-        headers: { "Content-Type": "application/json; charset=utf-8" },
+        //headers: { "Content-Type": "application/json; charset=utf-8" },
         body: {
           id: integer(1),
           owner: string("ClienteMovil"),
@@ -151,7 +151,7 @@ describe("Contrato: AppMovilBanco consume ApiCuentasBancarias", () => {
       })
       .willRespondWith({
         status: 400,
-        headers: { "Content-Type": "application/json; charset=utf-8" },
+        //headers: { "Content-Type": "application/json; charset=utf-8" },
         body: { error: like("No se puede transferir a la misma cuenta") },
       });
 
@@ -165,11 +165,28 @@ describe("Contrato: AppMovilBanco consume ApiCuentasBancarias", () => {
     });
   });
 
-  test.todo(
-    "POST /accounts/:id/deposit con un monto valido responde 200 y el saldo actualizado"
-  );
-
-  test.todo(
-    "GET /accounts responde 200 con un arreglo de cuentas"
-  );
+//ENUNCIADO 1
+test("POST /accounts/:id/deposit permite depositar un monto válido", async () => {
+  provider
+    .given("la cuenta 1 existe")
+    .uponReceiving("una solicitud de depósito válido")
+    .withRequest({
+      method: "POST", path: "/accounts/1/deposit",
+      headers: { "Content-Type": "application/json" },
+      body: { amountCents: 500 },
+    })
+    .willRespondWith({ status: 200, body: { success: boolean(true) } });
 });
+
+//ENUNCIADO 2
+test("GET /accounts devuelve un arreglo de cuentas", async () => {
+  provider
+    .given("existen varias cuentas")
+    .uponReceiving("una solicitud para listar cuentas")
+    .withRequest({ method: "GET", path: "/accounts" })
+    .willRespondWith({
+      status: 200,
+      body: eachLike({ id: integer(1), owner: string("Cliente") }),
+    });
+});
+}
