@@ -48,33 +48,28 @@ describe("API bancaria (E2E contra el stack completo)", () => {
   test("permite vaciar la cuenta transfiriendo el saldo completo", async () => {
     const origen = await nuevaCuenta("Omar", 4000);
     const destino = await nuevaCuenta("Pia", 0);
-
     const t = await api("/transfers", {
       method: "POST",
       body: JSON.stringify({ fromId: origen, toId: destino, amountCents: 4000 }),
     });
     expect(t.status).toBe(201);
-
     const cOrigen = await api(`/accounts/${origen}`);
     expect(Number(cOrigen.body.balance)).toBe(0);
   });
 
   test("rechaza una transferencia a la misma cuenta", async () => {
     const id = await nuevaCuenta("Rita", 5000);
-
     const t = await api("/transfers", {
       method: "POST",
       body: JSON.stringify({ fromId: id, toId: id, amountCents: 1000 }),
     });
     expect(t.status).toBe(400);
-
     const consulta = await api(`/accounts/${id}`);
     expect(Number(consulta.body.balance)).toBe(5000);
   });
 
   test("rechaza un deposito de monto cero", async () => {
     const id = await nuevaCuenta("Saul", 0);
-
     const dep = await api(`/accounts/${id}/deposit`, {
       method: "POST",
       body: JSON.stringify({ amountCents: 0 }),
@@ -85,7 +80,6 @@ describe("API bancaria (E2E contra el stack completo)", () => {
   test("una transferencia con referencia repetida no cobra dos veces al origen", async () => {
     const origen = await nuevaCuenta("Tomas", 10000);
     const destino = await nuevaCuenta("Uma", 0);
-
     await api("/transfers", {
       method: "POST",
       body: JSON.stringify({
@@ -104,16 +98,25 @@ describe("API bancaria (E2E contra el stack completo)", () => {
         reference: "PAGO-UNICO",
       }),
     });
-
     const cOrigen = await api(`/accounts/${origen}`);
     expect(Number(cOrigen.body.balance)).toBe(7500);
   });
 
-  test.todo(
-    "una consulta a una cuenta inexistente responde con codigo 404"
-  );
+// Ejercicio Propuesto 1: Consulta a cuenta inexistente responde 404 
 
-  test.todo(
-    "un retiro por encima del saldo disponible responde con codigo 422 y no altera el saldo"
-  );
+  test("una consulta a una cuenta inexistente responde con codigo 404", async () => {
+    const { status } = await api("/accounts/9999");
+    expect(status).toBe(404);
+  });
+// Ejercicio Propuesto 2: Retiro por encima del saldo disponible responde 422 sin alterar el saldo.
+  test("un retiro por encima del saldo disponible responde con codigo 422 y no altera el saldo", async () => {
+    const id = await nuevaCuenta("Victor", 5000);
+    const retiro = await api(`/accounts/${id}/withdraw`, {
+      method: "POST",
+      body: JSON.stringify({ amountCents: 6000 }),
+    });  
+    expect(retiro.status).toBe(422);
+    const consulta = await api(`/accounts/${id}`);
+    expect(Number(consulta.body.balance)).toBe(5000);
+  });
 });
