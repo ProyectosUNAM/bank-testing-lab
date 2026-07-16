@@ -1,5 +1,4 @@
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
-
 async function api(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json" },
